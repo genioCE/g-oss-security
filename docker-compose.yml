@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  vault:
+    image: hashicorp/vault:1.15
+    environment: [ "VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID}" ]
+    cap_add: [ "IPC_LOCK" ]
+    ports: ["8200:8200"]
+    command: server -dev -dev-root-token-id=${VAULT_DEV_ROOT_TOKEN_ID}
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_USER}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_PASSWORD}
+    ports: ["8089:8080"]
+  opa:
+    image: openpolicyagent/opa:latest
+    command: ["run","--server","/policies"]
+    volumes: ["./policies:/policies"]
+    ports: ["8181:8181"]
